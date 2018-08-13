@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎登录</title>
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/bbs.css">
+</head>
+<body>
+{% csrf_token %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="{{ form_obj.username.id_for_label }}">{{ form_obj.username.label }}</label>
+                    {{ form_obj.username }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form_obj.password.id_for_label }}">{{ form_obj.password.label }}</label>
+                    {{ form_obj.password }}
+                </div>
+                <div class="form-group">
+                    <label for="v-code" style="display: block;">验证码</label>
+                    <input type="text" id="v-code" class="form-control" style="width: 250px;display: inline-block">
+                    <img src="/v-code/" id="i1" style="float: right">
+                </div>
+                <p id="error-p" class="err-text"></p>
+                <button id="login-btn" type="button" class="btn btn-default">登录</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/static/js/jquery.js"></script>
+<script>
+    $("#login-btn").click(function () {
+        // 取用户填写的数据
+        let username = $("#id_username").val();
+        let pwd = $("#id_password").val();
+        let csrfToken = $("[name='csrfmiddlewaretoken']").val();
+        let vCode = $("#v-code").val();
+        // 发送ajax请求
+        $.ajax({
+            url: '/login/',
+            type: 'post',
+            data: {
+                username: username,
+                password: pwd,
+                csrfmiddlewaretoken: csrfToken,
+                v_code: vCode
+            },
+            success:function (res) {
+                console.log(res);
+                if (res.code !== 0){
+                    // 有错误
+                    $("#error-p").text(res.msg);
+                }else {
+                    location.href = '/index/'
+                }
+            }
+        })
+    });
+
+    $("input").focus(function () {
+        $("#error-p").text('');
+    });
+
+    $("#i1").click(function () {
+        this.src += "?"
+    })
+
+</script>
+</body>
+</html>
